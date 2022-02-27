@@ -1,0 +1,95 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+</head>
+<body>
+	<label for="name"> 贷款(万元) </label><input type="text" id="loan" value="" minlength="4" maxlength="8" size="10"></br>
+	<label for="name"> 年利率(%) </label><input type="text" id="rate" value="" minlength="4" maxlength="8" size="10"></br>
+	<label for="name"> 贷款年限(年) </label><input type="text" id="year" value="" minlength="4" maxlength="8" size="10"></br>
+	<label for="name"> 月供(万元) </label><input type="text" id="money" value="" minlength="4" maxlength="8" size="10" disabled></br>
+	<input type="button" id="draw" value="计算">
+	<div id="chartContainer" style="height: 370px; max-width: 920px; margin: 0px auto;"></div>
+	<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+</body>  
+
+<script type="text/javascript">
+
+var btn = document.getElementById("draw");
+
+function benxi(){
+
+	var array = [];
+	var loan = document.getElementById("loan").value;
+	var monthRate = document.getElementById("rate").value/1200;
+	var month = document.getElementById("year").value*12;
+	var money = loan*monthRate*(1+monthRate)**month/((1+monthRate)**month-1);
+
+	for (i=0;i<=35;i=i+5){
+		
+		var benjin = (1+monthRate)**(i*12)*loan-money*((1+monthRate)**(i*12)-1)/monthRate;
+		var lixi = money*(month-i*12)-benjin;
+		
+		if (benjin>=0){
+			array[2*i/5] = Math.round(benjin);
+			array[2*i/5+1] = Math.round(lixi);
+		} else {
+			array[2*i/5] = 0;
+			array[2*i/5+1] = 0;
+		}
+	}
+
+	return array;
+}
+
+btn.onclick = function (e) {
+
+	var loan = document.getElementById("loan").value;
+	var monthRate = document.getElementById("rate").value/1200;
+	var month = document.getElementById("year").value*12;
+	var money = loan*monthRate*(1+monthRate)**month/((1+monthRate)**month-1);
+
+	document.getElementById("money").value  = Math.round(money * 100) / 100;
+	var y = benxi();
+
+	var chart = new CanvasJS.Chart("chartContainer", {
+		animationEnabled: true,
+		theme: "light2",
+		title:{
+			text: "等额本息"
+		},
+		data: [{        
+			type: "line",
+			indexLabelFontSize: 16,
+			dataPoints: [
+				{ x: 0, y: y[0] },
+				{ x: 5, y: y[2] },
+				{ x: 10, y: y[4] },
+				{ x: 15, y: y[6] },
+				{ x: 20, y: y[8] },
+				{ x: 25, y: y[10] },
+				{ x: 30, y: y[12] },
+				{ x: 35, y: y[14] }
+			]
+		},
+		{        
+			type: "line",
+			indexLabelFontSize: 16,
+			dataPoints: [
+				{ x: 0, y: y[1] },
+				{ x: 5, y: y[3] },
+				{ x: 10, y: y[5] },
+				{ x: 15, y: y[7] },
+				{ x: 20, y: y[9] },
+				{ x: 25, y: y[11] },
+				{ x: 30, y: y[13] },
+				{ x: 35, y: y[15] }
+			]
+		}
+		]
+	});
+	chart.render();
+
+}
+</script>
+
+</html>
